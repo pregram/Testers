@@ -4,7 +4,16 @@
 
 ### 2. Upload the file to the terminal by clicking on New SFTP window.
 
+  <img src="https://github.com/pregram/Testers/blob/main/ex0/part1/Images/SFTP_guide.png"
+  style="width: 10%; height: 10%;"/>
+
 ### 3. Be sure to add the file under part1 directory/folder 
+
+<img src="https://github.com/pregram/Testers/blob/main/ex0/part1/Images/ChosingPart1Folder.png"
+  style="width: 50%; height: 50%;"/>
+  
+<img src="https://github.com/pregram/Testers/blob/main/ex0/part1/Images/SFTP_Uploading_Tester.png"
+  style="width: 50%; height: 50%;"/>
 
 ### 4. Enter in the terminal window change the directory to where the tester file is
 
@@ -12,7 +21,11 @@
 
 ### 6. run the tester `./tester`
 
+<img src="https://github.com/pregram/Testers/blob/main/ex0/part1/Images/Using_Tester.png"
+  style="width: 50%; height: 50%;"/>
+  
 ## Process
+
 - ### The tester asks you if you want to update `mtm_tot` if answered y it uses `gcc ..`
 
 - ### Running tests 
