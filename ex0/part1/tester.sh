@@ -40,12 +40,11 @@ if [ -z $(ls | grep $run_file) ]; then
         echo "make sure that $code_file exists in $req_name folder and try again"
         exit $DOESNT_EXIST
     else
-        gcc -std=c99 -Wall -pedantic-errors -Werror -DNDEBUG part1.c -o mtm_tot
-        if [ -z $(ls | grep $run_file) ]; then
+        if  gcc -std=c99 -Wall -pedantic-errors -Werror -DNDEBUG part1.c -o mtm_tot ; then
+            echo "Successfully created $run_file executable for $code_file "
+        else
             echo "Failed to create $run_file"
             exit $UNKNOWN_ERROR
-        else
-            echo "Successfully created $run_file executable for $code_file "
         fi
     fi
 fi
@@ -58,8 +57,7 @@ if [ $answer = 'y' ]; then
         echo "make sure that $code_file exists in $req_name folder and try again"
         exit $DOESNT_EXIST
     else
-        gcc -std=c99 -Wall -pedantic-errors -Werror -DNDEBUG part1.c -o mtm_tot
-        if [ -z $(ls | grep $run_file) ]; then
+        if  gcc -std=c99 -Wall -pedantic-errors -Werror -DNDEBUG part1.c -o mtm_tot ; then
             echo "Successfully created $run_file executable for $code_file "
         else
             echo "Failed to create $run_file"
@@ -88,8 +86,10 @@ rm $temp_file
 
 # Create tests
 tests_fold=testos
-mkdir $tests_fold
-echo "a directory/folder named: $tests_fold has been created to store tests"
+if [ -z $(ls | grep $tests_fold) ]; then
+    mkdir $tests_fold
+    echo "a directory/folder named: $tests_fold has been created to store tests"
+fi
 cd $tests_fold
 
 #test 5 ########################################
@@ -218,4 +218,3 @@ read answer
 if [ $answer = 'y' ]; then
     rm tester
 fi
-
