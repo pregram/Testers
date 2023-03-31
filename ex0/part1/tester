@@ -205,7 +205,7 @@ for ((i = 5 ; i <= $count ; i++)); do
 done
 
 # Write down number of failed tests out of total number of tests 
-echo "Summary: total tests: $count you failed: $failed_counter"
+echo "Summary: you failed $failed_counter tests out of $count tests"
 
 echo "Do you want to delete $tests_fold folder/directory? (y/n)"
 read answer
