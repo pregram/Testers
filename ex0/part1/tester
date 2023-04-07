@@ -4,7 +4,7 @@ out=".out"
 sol=".sol"
 # Current directory folder not full path
 dir_name=$(basename "$PWD")
-req_name='part1'
+req_name="part1"
 DOESNT_EXIST=1
 UNKNOWN_ERROR=2
 if [ $dir_name != $req_name ]; then
@@ -14,7 +14,7 @@ fi
 
 # Check if given tests exist
 total=4
-NOT_FOUND='WAS NOT FOUND IN'
+NOT_FOUND="WAS NOT FOUND IN"
 for ((i = 1 ; i <= $total ; i++)); do
     input=$test$i$in
     output=$test$i$out
@@ -28,9 +28,9 @@ for ((i = 1 ; i <= $total ; i++)); do
     fi
 done
 # check if mtm_tot exists and if it doesnt make it
-run_file='mtm_tot'
-code_file='part1.c'
-NOT_FOUND='WAS NOT FOUND'
+run_file="mtm_tot"
+code_file="part1.c"
+NOT_FOUND="WAS NOT FOUND"
 
 if [ -z $(ls | grep $run_file) ]; then
     echo "Error: executable for $code_file $NOT_FOUND"
@@ -67,17 +67,51 @@ if [ $answer = 'y' ]; then
 fi
 
 # Run first set of given tests total = 4
-temp_file=tmpout
+temp_file="tmpout"
+errors_fold="Errors"
+err=".error"
+change=".diff"
+diff_fold="Differences"
+
+# Create directories and wait 2 seconds until they read
+if [ -z $(ls | grep $diff_fold) ]; then
+    mkdir $diff_fold
+    echo -e "Created $diff_fold directory/folder that will contain the output of diff command for each test\n"
+    sleep 2
+fi
+
+#if [ -z $(ls | grep $errors_fold) ]; then
+#    mkdir $errors_fold
+#    echo -e "Created $errors_fold directory/folder that will contain the output of errors for each test\n"
+#    sleep 2
+#fi
+
 failed_counter=0
+EXTREME_ERROR_MESSAGE="There could have been a segmentation fault
+                       \nor you might have not returned 0 in main function
+                       \nEnding current testing try again later"
 for ((i = 1 ; i <= $total ; i++)); do
     input=$test$i$in
     output=$test$i$out
-    ./mtm_tot < $input > $temp_file
+    #error=$test$i$err
+    difference=$test$i$change
     echo Running test $i..
-    if [ -z $(diff $output $temp_file) ]; then
+    # Find some way to handle errors of the type segmentation fault / core dump etc..    
+    # Found it >>>>>>>
+    ./mtm_tot < $input > $temp_file
+    if [ $? -ne 0 ]; then
+        echo -e $EXTREME_ERROR_MESSAGE
+        exit $UNKNOWN_ERROR
+    fi
+    # Found it ^^^<<<<<<<
+    diff_out=$(diff $output $temp_file)
+    # Check if it's an empty string
+    if [ -z "$diff_out" ]; then
         echo "Passed test $i"
     else
         echo "Failed test $i"
+        # Write out the difference in given diff file and $ sign at the end of each line 
+        diff $output $temp_file | cat -A > $diff_fold/$difference
         failed_counter=$(($failed_counter+1))
     fi
     echo -e "----------------------------\n"
@@ -85,7 +119,7 @@ done
 rm $temp_file
 
 # Create tests
-tests_fold=testos
+tests_fold="testos"
 if [ -z $(ls | grep $tests_fold) ]; then
     mkdir $tests_fold
     echo "a directory/folder named: $tests_fold has been created to store tests"
@@ -192,13 +226,19 @@ for ((i = 5 ; i <= $count ; i++)); do
     input=$test$i$in
     output=$test$i$out
     solution=$test$i$sol
-    ./mtm_tot < $input > $output
+    difference=test$i$change
     ./mtm_sol < $input > $solution
+    ./mtm_tot < $input > $output
+    if [ $? -ne 0 ]; then
+        echo -e $EXTREME_ERROR_MESSAGE
+        exit $UNKNOWN_ERROR
+    fi
     echo Running test $i ..
-    if [ -z $(diff $solution $output) ]; then
+    if [ -z "$(diff $solution $output)" ]; then
         echo "Passed test $i"
     else
         echo "Failed test $i"
+        diff $solution $output | cat -A > $diff_fold/$difference
         failed_counter=$(($failed_counter+1))
     fi
     echo -e "----------------------------\n"
@@ -213,7 +253,13 @@ echo "Summary: you passed $success_counter tests out of $count tests"
 echo "Do you want to delete $tests_fold folder/directory? (y/n)"
 read answer
 if [ $answer = 'y' ]; then
-    rm -r testos/
+    rm -r $tests_fold
+fi
+
+echo "Do you want to delete $diff_fold folder/directory? (y/n)"
+read answer
+if [ $answer = 'y' ]; then
+    rm -r $diff_fold
 fi
 
 echo "Do you want to delete tester? (y/n)"
