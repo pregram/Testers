@@ -208,14 +208,14 @@ echo 1 0.2 > test$count.in
 # Picked a large prime for max array length
 echo "There are currently 22 tests how many tests in total do you want?"
 read requested_tests
-max_tests=22
-if [ "$requested_tests" -gt "$max_tests" ]; then
-    max_tests=$requested_tests
+min_tests=22
+if [ "$requested_tests" -lt "$min_tests" ]; then
+    requested_tests=$min_tests
 fi
 max_len=173
 max_num=214726271
 some_prime=44491
-for ((j = $count ; j < $max_tests ; j++)); do
+for ((j = $count ; j < $requested_tests ; j++)); do
     count=$(($count+1))
     curr_len=$(( $RANDOM % $max_len ))
     neg_nums=$(( $curr_len / 5 ))
