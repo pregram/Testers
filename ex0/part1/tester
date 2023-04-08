@@ -1,294 +1,337 @@
-test="test"
-in=".in"
-out=".out"
-sol=".sol"
-# Current directory folder not full path
-dir_name=$(basename "$PWD")
-req_name="part1"
+# Error defenitions
 DOESNT_EXIST=1
 UNKNOWN_ERROR=2
-if [ $dir_name != $req_name ]; then
-    echo "Error: you must be in $req_name but you are in $dir_name"
+# Error Messages
+
+# Defining repeated texts (constant strings)
+TEST="test"
+YES="y"
+JUMP_SPACE="----------------------------\n"
+ERROR="Error:"
+REQ_NAME="part1"
+RUN_FILE="mtm_tot"
+CODE_FILE="part1.c"
+BUILD_EXE="gcc -std=c99 -Wall -pedantic-errors -Werror -DNDEBUG $CODE_FILE -o $RUN_FILE"
+TEMP_FILE="tmpout"
+DIFF_FOLD="Differences"
+EXTREME_ERROR_MESSAGE="There could have been a segmentation fault
+                       \nor you might have not returned 0 in main function
+                       \nEnding current testing try again later"
+TESTS_FOLD="testos"
+INNER_TEST="$TESTS_FOLD/$TEST"
+SOLUTION_EXE="mtm_sol"
+
+# File extensions
+IN=".in"
+OUT=".out"
+SOL=".solution"
+ERR=".error"
+DIF=".diff"
+
+# Constant number
+INCREMENT=1
+START=1
+SLEEP_SECONDS=2
+TOTAL_GIVEN=4
+MIN_TESTS=22
+
+# Command 'basename' gives the last part of the given path
+# example: $PWD="~/user/Folder1" `basename "$PWD"` = Folder1 
+# $(command) - saves command's output as text 
+
+# Checking if you are in the required directory named part1
+dir_name=$(basename "$PWD")
+if [ "$dir_name" != "$REQ_NAME" ]; then
+    echo "$ERROR you must be in $REQ_NAME but you are in $dir_name"
     exit $DOESNT_EXIST
 fi
 
 # Check if given tests exist
-total=4
 NOT_FOUND="WAS NOT FOUND IN"
-for ((i = 1 ; i <= $total ; i++)); do
-    input=$test$i$in
-    output=$test$i$out
+for ((i = $START ; i <= $TOTAL_GIVEN ; i++)); do
+    
+    # Defining file names
+    input=$TEST$i$IN
+    output=$TEST$i$out
+
     if [ -z $(ls | grep $input) ]; then
-        echo "Error: $input $NOT_FOUND $req_name"
+        echo "$ERROR $input $NOT_FOUND $REQ_NAME"
         exit $DOESNT_EXIST
     fi
     if [ -z $(ls | grep $output) ]; then
-        echo "Error: $output $NOT_FOUND $req_name"
+        echo "$ERROR $output $NOT_FOUND $REQ_NAME"
         exit $DOESNT_EXIST
     fi
 done
-# check if mtm_tot exists and if it doesnt make it
-run_file="mtm_tot"
-code_file="part1.c"
+
+# given tests are available
+
+
 NOT_FOUND="WAS NOT FOUND"
 
-if [ -z $(ls | grep $run_file) ]; then
-    echo "Error: executable for $code_file $NOT_FOUND"
-    echo "Trying to create $run_file executable for $code_file ..."
-    if [ -z $(ls | grep $code_file) ]; then
-        echo "Error: $code_file $NOT_FOUND"
-        echo "make sure that $code_file exists in $req_name folder and try again"
+# check if mtm_tot exists and if it doesnt make it
+if [ -z $(ls | grep $RUN_FILE) ]; then
+    echo "$ERROR executable for $CODE_FILE $NOT_FOUND"
+    echo "Trying to create $RUN_FILE executable for $CODE_FILE ..."
+    if [ -z $(ls | grep $CODE_FILE) ]; then
+        echo "$ERROR $CODE_FILE $NOT_FOUND"
+        echo "make sure that $CODE_FILE exists in $REQ_NAME folder and try again"
         exit $DOESNT_EXIST
     else
-        if  gcc -std=c99 -Wall -pedantic-errors -Werror -DNDEBUG part1.c -o mtm_tot ; then
-            echo "Successfully created $run_file executable for $code_file "
+        if  "$BUILD_EXE" ; then
+            echo "Successfully created $RUN_FILE executable for $CODE_FILE "
         else
-            echo "Failed to create $run_file"
-            exit $UNKNOWN_ERROR
-        fi
-    fi
-fi
-# Ask to update executable
-echo "Do you want to update mtm_tot executable (y/n)"
-read answer
-if [ $answer = 'y' ]; then
-    if [ -z $(ls | grep $code_file) ]; then
-        echo "Error: $code_file $NOT_FOUND"
-        echo "make sure that $code_file exists in $req_name folder and try again"
-        exit $DOESNT_EXIST
-    else
-        if  gcc -std=c99 -Wall -pedantic-errors -Werror -DNDEBUG part1.c -o mtm_tot ; then
-            echo "Successfully created $run_file executable for $code_file "
-        else
-            echo "Failed to create $run_file"
+            echo "Failed to create $RUN_FILE"
             exit $UNKNOWN_ERROR
         fi
     fi
 fi
 
-# Run first set of given tests total = 4
-temp_file="tmpout"
-errors_fold="Errors"
-err=".error"
-change=".diff"
-diff_fold="Differences"
+# Ask to update executable
+echo "Do you want to update $RUN_FILE executable (y/n)"
+read answer
+if [ "$answer" = "$YES" ]; then
+    if [ -z $(ls | grep $CODE_FILE) ]; then
+        echo "$ERROR $CODE_FILE $NOT_FOUND"
+        echo "make sure that $CODE_FILE exists in $REQ_NAME folder and try again"
+        exit $DOESNT_EXIST
+    else
+        if  "$BUILD_EXE" ; then
+            echo "Successfully created $RUN_FILE executable for $CODE_FILE "
+        else
+            echo "Failed to create $RUN_FILE"
+            exit $UNKNOWN_ERROR
+        fi
+    fi
+fi
+
+# Run first set of given tests TOTAL_GIVEN = 4
 
 # Create directories and wait 2 seconds until they read
-if [ -z $(ls | grep $diff_fold) ]; then
-    mkdir $diff_fold
-    echo -e "Created $diff_fold directory/folder that will contain the output of diff command for each test\n"
-    sleep 2
+if [ -z $(ls | grep $DIFF_FOLD) ]; then
+    mkdir $DIFF_FOLD
+    echo -e "Created $DIFF_FOLD directory/folder that will contain the output of diff command for each $TEST\n"
+    sleep $SLEEP_SECONDS
 fi
 
-#if [ -z $(ls | grep $errors_fold) ]; then
-#    mkdir $errors_fold
-#    echo -e "Created $errors_fold directory/folder that will contain the output of errors for each test\n"
-#    sleep 2
-#fi
-
 failed_counter=0
-EXTREME_ERROR_MESSAGE="There could have been a segmentation fault
-                       \nor you might have not returned 0 in main function
-                       \nEnding current testing try again later"
-for ((i = 1 ; i <= $total ; i++)); do
-    input=$test$i$in
-    output=$test$i$out
-    #error=$test$i$err
-    difference=$test$i$change
-    echo Running test $i..
-    # Find some way to handle errors of the type segmentation fault / core dump etc..    
-    # Found it >>>>>>>
-    ./mtm_tot < $input > $temp_file
+for ((i = $START ; i <= $TOTAL_GIVEN ; i++)); do
+
+    # Defining messages  
+    running_test_msg="Running $TEST $i .."
+    passed_test_msg="Passed $TEST $i"
+    failed_test_msg="Failed $TEST $i"
+    
+    # Defining file names
+    input=$TEST$i$IN
+    output=$TEST$i$OUT
+    difference=$TEST$i$DIF
+    echo "$running_test_msg"
+
+    # Running program and saving output temporarily
+    ./"$RUN_FILE" < $input > $TEMP_FILE
+
+    # Check if an unexpected error happened like division by zero
     if [ $? -ne 0 ]; then
         echo -e $EXTREME_ERROR_MESSAGE
         exit $UNKNOWN_ERROR
     fi
-    # Found it ^^^<<<<<<<
-    diff_out=$(diff $output $temp_file)
+
+    diff_out=$(diff $output $TEMP_FILE)
     # Check if it's an empty string
     if [ -z "$diff_out" ]; then
-        echo "Passed test $i"
+        echo "$passed_test_msg"
     else
-        echo "Failed test $i"
+        echo "$failed_test_msg"
         # Write out the difference in given diff file and $ sign at the end of each line 
-        diff $output $temp_file | cat -A > $diff_fold/$difference
-        failed_counter=$(($failed_counter+1))
+        diff $output $TEMP_FILE | cat -A > "$DIFF_FOLD/$difference"
+        failed_counter=$(($failed_counter + $INCREMENT))
     fi
     echo -e "----------------------------\n"
 done
-rm $temp_file
+rm $TEMP_FILE
 
 # Create tests
-tests_fold="testos"
-if [ -z $(ls | grep $tests_fold) ]; then
-    mkdir $tests_fold
-    echo "a directory/folder named: $tests_fold has been created to store tests"
+if [ -z $(ls | grep $TESTS_FOLD) ]; then
+    mkdir $TESTS_FOLD
+    echo "a directory/folder named: $TESTS_FOLD has been created to store tests"
 fi
-cd $tests_fold
+cd $TESTS_FOLD
 
 #test 5 ########################################
-count=$(($total+1))
-echo 0.1 > test$count.in
+count=$(($TOTAL_GIVEN + $INCREMENT))
+echo "0.1" > $TEST$count$IN
 
 #test 6 #######################################
-count=$(($count+1))
-echo -1000009 > test$count.in
+count=$(($count + $INCREMENT))
+echo "-1000009" > $TEST$count$IN
 
 #test 7 #######################################
-count=$(($count+1))
-echo a1 > test$count.in
+count=$(($count + $INCREMENT))
+echo "a1" > $TEST$count$IN
 
 #test 8 #######################################
-count=$(($count+1))
-echo a1 > test$count.in
-echo 8 >> test$count.in
+count=$(($count + $INCREMENT))
+echo "a1" > $TEST$count$IN
+echo "8" >> $TEST$count$IN
 
 #test 9 #######################################
-count=$(($count+1))
-echo 10 > test$count.in
-echo 0 1 2 4 8 16 32 64 128 256 >> test$count.in
+count=$(($count + $INCREMENT))
+echo "10" > $TEST$count$IN
+echo "0 1 2 4 8 16 32 64 128 256" >> $TEST$count$IN
 
 #test 10 #######################################
-count=$(($count+1))
-touch test$count.in
+count=$(($count + $INCREMENT))
+touch $TEST$count$IN
 
 #test 11 #######################################
-count=$(($count+1))
-echo 1 > test$count.in
+count=$(($count + $INCREMENT))
+echo "1" > $TEST$count$IN
 
 #test 12 #######################################
-count=$(($count+1))
-echo 2 4 > test$count.in
+count=$(($count + $INCREMENT))
+echo "2 4" > $TEST$count$IN
 
 #test 13 #######################################
-count=$(($count+1))
-echo 10 -6 5 4 3 32 256 1024 -1024 -256 0 > test$count.in
+count=$(($count + $INCREMENT))
+echo "10 -6 5 4 3 32 256 1024 -1024 -256 0" > $TEST$count$IN
 
 #test 14 #######################################
-count=$(($count+1))
-echo 5 1 1 1 1 1 > test$count.in
+count=$(($count + $INCREMENT))
+echo "5 1 1 1 1 1" > $TEST$count$IN
 
 #test 15 #######################################
-count=$(($count+1))
-echo 3 > test$count.in
-echo        >> test$count.in
-echo 0 >> test$count.in
-echo -2 >> test$count.in
-echo -64 >> test$count.in
-echo 1 >> test$count.in
+count=$(($count + $INCREMENT))
+echo "3" > $TEST$count$IN
+echo "    " >> $TEST$count$IN
+echo "0" >> $TEST$count$IN
+echo "-2" >> $TEST$count$IN
+echo "-64" >> $TEST$count$IN
+echo "1" >> $TEST$count$IN
 
 #test 16 #######################################
-count=$(($count+1))
-echo 1 1.0 > test$count.in
+count=$(($count + $INCREMENT))
+echo "1 1.0" > $TEST$count$IN
 
 #test 17 #######################################
-count=$(($count+1))
-echo 2 1 a1 > test$count.in
+count=$(($count + $INCREMENT))
+echo "2 1 a1" > $TEST$count$IN
 
 #test 18 #######################################
-count=$(($count+1))
-echo 5 1 2 3.0 4 5 > test$count.in
+count=$(($count + $INCREMENT))
+echo "5 1 2 3.0 4 5" > $TEST$count$IN
 
 #test 19 #######################################
-count=$(($count+1))
-echo 6 -2 2 4 3 -32 35 > test$count.in
+count=$(($count + $INCREMENT))
+echo "6 -2 2 4 3 -32 35" > $TEST$count$IN
 
 #test 20 #######################################
-count=$(($count+1))
-echo 3 45623145 1048576 -4194304 > test$count.in
+count=$(($count + $INCREMENT))
+echo "3 45623145 1048576 -4194304" > $TEST$count$IN
 
 #test 21 #######################################
-count=$(($count+1))
-echo 1 0 > test$count.in
+count=$(($count + $INCREMENT))
+echo "1 0" > $TEST$count$IN
 
 #test 22 #######################################
-count=$(($count+1))
-echo 1 0.2 > test$count.in
+count=$(($count + $INCREMENT))
+echo "1 0.2" > $TEST$count$IN
 
-# Picked a large prime for max array length
-echo "There are currently 22 tests how many tests in total do you want?"
+# Get the requested number of tests
+echo "There are currently $count tests how many tests in total do you want?"
 read requested_tests
-min_tests=22
-if [ "$requested_tests" -lt "$min_tests" ]; then
-    requested_tests=$min_tests
+if [ "$requested_tests" -lt "$MIN_TESTS" ]; then
+    requested_tests=$MIN_TESTS
 fi
-max_len=173
-max_num=214726271
-some_prime=44491
+
+MAX_ARR_LEN=173
+MAX_NUM=214726271
+SOME_PRIME=44491
+PERCENTAGE=0.2
 for ((j = $count ; j < $requested_tests ; j++)); do
-    count=$(($count+1))
-    curr_len=$(( $RANDOM % $max_len ))
-    neg_nums=$(( $curr_len / 5 ))
-    echo $curr_len > test$count.in
-    for ((i = 1 ; i <= $curr_len ; i++)); do
-        if [ "$neg_nums" -gt "0" ]; then
-            curr_num=$(( $RANDOM % $max_num - $some_prime))
-            neg_nums=$(( $neg_nums - 1 ))
+    count=$(($count+$INCREMENT))
+    curr_len=$(($RANDOM % $MAX_ARR_LEN))
+    num_of_negative=$(($curr_len * $PERCENTAGE))
+    echo $curr_len > $TEST$count$IN
+    for ((i = $START ; i <= $curr_len ; i++)); do
+        if [ "$num_of_negative" -gt "0" ]; then
+            curr_num=$(( $RANDOM % $MAX_NUM - $SOME_PRIME))
+            num_of_negative=$(( $num_of_negative - 1 ))
         else
-            curr_num=$(( $RANDOM % $max_num ))
+            curr_num=$(( $RANDOM % $MAX_NUM ))
         fi
-        echo $curr_num >> test$count.in
+        echo $curr_num >> $TEST$count$IN
     done
 done
 cd ..
 # Waiting for another test 
 
 # Writing tests has ended
-test="testos/test"
-in=".in"
-out=".out"
-sol=".sol"
+
 # Check if mtm_sol exist
-solution_exe='mtm_sol'
-if [ -z $(ls | grep $solution_exe) ]; then
-    echo "Error: $solution_exe $NOT_FOUND"
-    echo "Try again after adding $solution_exe to $req_name"
+if [ -z $(ls | grep $SOLUTION_EXE) ]; then
+    echo "$ERROR $SOLUTION_EXE $NOT_FOUND"
+    echo "Try again after adding $SOLUTION_EXE to $REQ_NAME"
     exit $DOESNT_EXIST
 fi
-
 # Run the tests that have been created
 for ((i = 5 ; i <= $count ; i++)); do
-    input=$test$i$in
-    output=$test$i$out
-    solution=$test$i$sol
-    difference=test$i$change
-    ./mtm_sol < $input > $solution
-    ./mtm_tot < $input > $output
+    
+    # Defining messages  
+    running_test_msg="Running $TEST $i .."
+    passed_test_msg="Passed $TEST $i"
+    failed_test_msg="Failed $TEST $i"
+    
+    # Defining file names
+    input=$INNER_TEST$i$in
+    output=$INNER_TEST$i$out
+    solution=$INNER_TEST$i$sol
+    difference=$TEST$i$change
+
+    # Running tests and saving outputs
+    ./"$SOLUTION_EXE" < $input > $solution
+    ./"$RUN_FILE" < $input > $output
+
+    # Check if an unexpected error happened like division by zero
     if [ $? -ne 0 ]; then
-        echo -e $EXTREME_ERROR_MESSAGE
+        echo -e "$EXTREME_ERROR_MESSAGE"
         exit $UNKNOWN_ERROR
     fi
-    echo Running test $i ..
+
+    echo "$running_test_msg"
+
+    # Check if there is a difference between outputs
     if [ -z "$(diff $solution $output)" ]; then
-        echo "Passed test $i"
+        echo "$passed_test_msg"
     else
-        echo "Failed test $i"
-        diff $solution $output | cat -A > $diff_fold/$difference
-        failed_counter=$(($failed_counter+1))
+        echo "$failed_test_msg"
+        # save diff output to difference file in Difference folder 
+        # while adding $ sign to each line's end
+        diff $solution $output | cat -A > "$DIFF_FOLD/$difference"
+        failed_counter=$(($failed_counter + $INCREMENT))
     fi
-    echo -e "----------------------------\n"
+    echo -e "$JUMP_SPACE"
 done
 
-# Write down number of failed tests out of total number of tests 
-# echo "Summary: you failed $failed_counter tests out of $count tests"
-# Write down number of passed tests out of total number of tests 
-success_counter=$(($count-$failed_counter))
+# Finished testing phase
+
+success_counter=$(($count - $failed_counter))
 echo "Summary: you passed $success_counter tests out of $count tests"
 
-echo "Do you want to delete $tests_fold folder/directory? (y/n)"
+echo "Do you want to delete $TESTS_FOLD folder/directory? (y/n)"
 read answer
-if [ $answer = 'y' ]; then
-    rm -r $tests_fold
+if [ "$answer" = "$YES" ]; then
+    rm -r "$TESTS_FOLD"
 fi
 
-echo "Do you want to delete $diff_fold folder/directory? (y/n)"
+echo "Do you want to delete $DIFF_FOLD folder/directory? (y/n)"
 read answer
-if [ $answer = 'y' ]; then
-    rm -r $diff_fold
+if [ "$answer" = "$YES" ]; then
+    rm -r "$DIFF_FOLD"
 fi
 
 echo "Do you want to delete tester? (y/n)"
 read answer
-if [ $answer = 'y' ]; then
+if [ "$answer" = "$YES" ]; then
     rm tester
 fi
