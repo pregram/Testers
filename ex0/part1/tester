@@ -54,11 +54,11 @@ for ((i = $START ; i <= $TOTAL_GIVEN ; i++)); do
     input=$TEST$i$IN
     output=$TEST$i$out
 
-    if [ -z $(ls | grep $input) ]; then
+    if [ -z "$(ls | grep $input)" ]; then
         echo "$ERROR $input $NOT_FOUND $REQ_NAME"
         exit $DOESNT_EXIST
     fi
-    if [ -z $(ls | grep $output) ]; then
+    if [ -z "$(ls | grep $output)" ]; then
         echo "$ERROR $output $NOT_FOUND $REQ_NAME"
         exit $DOESNT_EXIST
     fi
@@ -70,10 +70,10 @@ done
 NOT_FOUND="WAS NOT FOUND"
 
 # check if mtm_tot exists and if it doesnt make it
-if [ -z $(ls | grep $RUN_FILE) ]; then
+if [ -z "$(ls | grep $RUN_FILE)" ]; then
     echo "$ERROR executable for $CODE_FILE $NOT_FOUND"
     echo "Trying to create $RUN_FILE executable for $CODE_FILE ..."
-    if [ -z $(ls | grep $CODE_FILE) ]; then
+    if [ -z "$(ls | grep $CODE_FILE)" ]; then
         echo "$ERROR $CODE_FILE $NOT_FOUND"
         echo "make sure that $CODE_FILE exists in $REQ_NAME folder and try again"
         exit $DOESNT_EXIST
@@ -91,7 +91,7 @@ fi
 echo "Do you want to update $RUN_FILE executable (y/n)"
 read answer
 if [ "$answer" = "$YES" ]; then
-    if [ -z $(ls | grep $CODE_FILE) ]; then
+    if [ -z "$(ls | grep $CODE_FILE)" ]; then
         echo "$ERROR $CODE_FILE $NOT_FOUND"
         echo "make sure that $CODE_FILE exists in $REQ_NAME folder and try again"
         exit $DOESNT_EXIST
@@ -108,7 +108,7 @@ fi
 # Run first set of given tests TOTAL_GIVEN = 4
 
 # Create directories and wait 2 seconds until they read
-if [ -z $(ls | grep $DIFF_FOLD) ]; then
+if [ -z "$(ls | grep $DIFF_FOLD)" ]; then
     mkdir $DIFF_FOLD
     echo -e "Created $DIFF_FOLD directory/folder that will contain the output of diff command for each $TEST\n"
     sleep $SLEEP_SECONDS
@@ -152,7 +152,7 @@ done
 rm $TEMP_FILE
 
 # Create tests
-if [ -z $(ls | grep $TESTS_FOLD) ]; then
+if [ -z "$(ls | grep $TESTS_FOLD)" ]; then
     mkdir $TESTS_FOLD
     echo "a directory/folder named: $TESTS_FOLD has been created to store tests"
 fi
@@ -269,7 +269,7 @@ cd ..
 # Writing tests has ended
 
 # Check if mtm_sol exist
-if [ -z $(ls | grep $SOLUTION_EXE) ]; then
+if [ -z "$(ls | grep $SOLUTION_EXE)" ]; then
     echo "$ERROR $SOLUTION_EXE $NOT_FOUND"
     echo "Try again after adding $SOLUTION_EXE to $REQ_NAME"
     exit $DOESNT_EXIST
