@@ -52,7 +52,7 @@ for ((i = $START ; i <= $TOTAL_GIVEN ; i++)); do
     
     # Defining file names
     input=$TEST$i$IN
-    output=$TEST$i$out
+    output=$TEST$i$OUT
 
     if [ -z "$(ls | grep $input)" ]; then
         echo "$ERROR $input $NOT_FOUND $REQ_NAME"
@@ -78,7 +78,7 @@ if [ -z "$(ls | grep $RUN_FILE)" ]; then
         echo "make sure that $CODE_FILE exists in $REQ_NAME folder and try again"
         exit $DOESNT_EXIST
     else
-        if  "$BUILD_EXE" ; then
+        if  $BUILD_EXE ; then
             echo "Successfully created $RUN_FILE executable for $CODE_FILE "
         else
             echo "Failed to create $RUN_FILE"
@@ -96,7 +96,7 @@ if [ "$answer" = "$YES" ]; then
         echo "make sure that $CODE_FILE exists in $REQ_NAME folder and try again"
         exit $DOESNT_EXIST
     else
-        if  "$BUILD_EXE" ; then
+        if  $BUILD_EXE ; then
             echo "Successfully created $RUN_FILE executable for $CODE_FILE "
         else
             echo "Failed to create $RUN_FILE"
@@ -247,11 +247,11 @@ fi
 MAX_ARR_LEN=173
 MAX_NUM=214726271
 SOME_PRIME=44491
-PERCENTAGE=0.2
+PERCENTAGE=5
 for ((j = $count ; j < $requested_tests ; j++)); do
-    count=$(($count+$INCREMENT))
+    count=$(($count + $INCREMENT))
     curr_len=$(($RANDOM % $MAX_ARR_LEN))
-    num_of_negative=$(($curr_len * $PERCENTAGE))
+    num_of_negative=$(($curr_len / $PERCENTAGE))
     echo $curr_len > $TEST$count$IN
     for ((i = $START ; i <= $curr_len ; i++)); do
         if [ "$num_of_negative" -gt "0" ]; then
@@ -283,10 +283,10 @@ for ((i = 5 ; i <= $count ; i++)); do
     failed_test_msg="Failed $TEST $i"
     
     # Defining file names
-    input=$INNER_TEST$i$in
-    output=$INNER_TEST$i$out
-    solution=$INNER_TEST$i$sol
-    difference=$TEST$i$change
+    input=$INNER_TEST$i$IN
+    output=$INNER_TEST$i$OUT
+    solution=$INNER_TEST$i$SOL
+    difference=$TEST$i$DIF
 
     # Running tests and saving outputs
     ./"$SOLUTION_EXE" < $input > $solution
