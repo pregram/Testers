@@ -24,3 +24,9 @@
 <img src="https://github.com/pregram/Testers/blob/main/ex0/part1/Images/Using_Tester.png"
   style="width: 50%; height: 50%;"/>
   
+> ## Possible Error messages:
+>
+> ### if you receive the following error message: `./tester: line 18 syntax error near unexpected token $'do\r'` then run the following command: `dos2unix tester` and go back to step 6 (rerun the program with `./tester`)
+> 
+>
+>
